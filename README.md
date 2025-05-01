@@ -1,5 +1,7 @@
 # CloudFlair
 
+**Important note: As of late 2024, Censys does not provide API access to free accounts anymore. This means CloudFlair does not work with free Censys accounts anymore**.
+
 CloudFlair is a tool to find origin servers of websites protected by CloudFlare (or CloudFront) which are publicly exposed and don't appropriately restrict network access to the relevant CDN IP ranges.
 
 The tool uses Internet-wide scan data from [Censys](https://censys.io) to find exposed IPv4 hosts presenting an SSL certificate associated with the target's domain name. API keys are required and can be retrieved from your [Censys account](https://search.censys.io/account/api).
