@@ -7,7 +7,6 @@ import sys
 import censys_search
 import requests
 import urllib3
-from html_similarity import similarity
 import cli
 import random
 
@@ -138,6 +137,7 @@ def save_origins_to_file(origins, output_file):
         sys.stderr.write('[-] Unable to write to output file %s : %s\n' % (output_file, e))
 
 def find_origins(domain, candidates):
+    from html_similarity import similarity
     print('\n[*] Testing candidate origin servers')
     original_response = retrieve_original_page(domain)
     host_header_value = original_response.url.replace('https://', '').split('/')[0]

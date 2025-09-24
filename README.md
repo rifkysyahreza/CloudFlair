@@ -64,7 +64,7 @@ $ export CENSYS_API_KEY=...
 3. Clone the repository
 
 ```bash
-$ git clone https://github.com/christophetd/CloudFlair.git
+$ git clone https://github.com/rifkysyahreza/CloudFlair.git
 ```
 
 4. Create a virtual env and install the dependencies
@@ -82,7 +82,8 @@ pip install -r requirements.txt
 python cloudflair.py myvulnerable.site
 ```
 
-or for CloudFront 
+or for CloudFront
+
 ```bash
 python cloudflair.py myvulnerable.site --cloudfront
 ```
