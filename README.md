@@ -54,12 +54,11 @@ $ python cloudflair.py myvulnerable.site
 
 ## Setup
 
-1. Register an account (free) on <https://search.censys.io/register>
-2. Browse to <https://search.censys.io/account/api>, and set two environment variables with your API ID and API secret
+1. Register an account on <https://search.censys.io/register>
+2. Browse to <https://search.censys.io/account/api>, and set an environment variable with your Personal Access Token (API key)
 
 ```bash
-$ export CENSYS_API_ID=...
-$ export CENSYS_API_SECRET=...
+$ export CENSYS_API_KEY=...
 ```
 
 3. Clone the repository
@@ -93,7 +92,7 @@ python cloudflair.py myvulnerable.site --cloudfront
 ```bash
 $ python cloudflair.py --help
 
-usage: cloudflair.py [-h] [-o OUTPUT_FILE] [--censys-api-id CENSYS_API_ID] [--censys-api-secret CENSYS_API_SECRET] [--cloudfront] domain
+usage: cloudflair.py [-h] [-o OUTPUT_FILE] [--censys-api-key CENSYS_API_KEY] [--cloudfront] domain
 
 positional arguments:
   domain                The domain to scan
@@ -102,10 +101,8 @@ options:
   -h, --help            show this help message and exit
   -o OUTPUT_FILE, --output OUTPUT_FILE
                         A file to output likely origin servers to (default: None)
-  --censys-api-id CENSYS_API_ID
-                        Censys API ID. Can also be defined using the CENSYS_API_ID environment variable (default: None)
-  --censys-api-secret CENSYS_API_SECRET
-                        Censys API secret. Can also be defined using the CENSYS_API_SECRET environment variable (default: None)
+  --censys-api-key CENSYS_API_KEY
+                        Censys Personal Access Token. Can also be defined using the CENSYS_API_KEY environment variable (default: None)
   --cloudfront          Check Cloudfront instead of CloudFlare. (default: False)
 ```
 
@@ -114,15 +111,14 @@ options:
 A lightweight Docker image of CloudFlair ([`christophetd/cloudflair`](https://hub.docker.com/r/christophetd/cloudflair/)) is provided. A scan can easily be instantiated using the following command.
 
 ```bash
-$ docker run --rm -e CENSYS_API_ID=your-id -e CENSYS_API_SECRET=your-secret christophetd/cloudflair myvulnerable.site
+$ docker run --rm -e CENSYS_API_KEY=your-token christophetd/cloudflair myvulnerable.site
 ```
 
 You can also create a file containing the definition of the environment variables, and use the Docker`--env-file` option.
 
 ```bash
 $ cat censys.env
-CENSYS_API_ID=your-id
-CENSYS_API_SECRET=your-secret
+CENSYS_API_KEY=your-token
 
 $ docker run --rm --env-file=censys.env christophetd/cloudflair myvulnerable.site
 ```

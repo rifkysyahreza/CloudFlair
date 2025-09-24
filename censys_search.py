@@ -13,10 +13,10 @@ INVALID_CREDS = "[-] Your Censys credentials look invalid.\n"
 RATE_LIMIT = "[-] Looks like you exceeded your Censys account limits rate. Exiting\n"
 
 
-def get_certificates(domain, api_id, api_secret, pages=2) -> set:
+def get_certificates(domain, api_key, pages=2) -> set:
     try:
         censys_certificates = CensysCerts(
-            api_id=api_id, api_secret=api_secret, user_agent=USER_AGENT
+            api_key=api_key, user_agent=USER_AGENT
         )
 
         certificate_query = f"names: {domain} and parsed.signature.valid: true and not names: cloudflaressl.com"
@@ -37,10 +37,10 @@ def get_certificates(domain, api_id, api_secret, pages=2) -> set:
         exit(1)
 
 
-def get_hosts(cert_fingerprints, api_id, api_secret):
+def get_hosts(cert_fingerprints, api_key):
     try:
         censys_hosts = CensysHosts(
-            api_id=api_id, api_secret=api_secret, user_agent=USER_AGENT
+            api_key=api_key, user_agent=USER_AGENT
         )
         hosts_query = f"services.tls.certificates.leaf_data.fingerprint: {{{','.join(cert_fingerprints)}}}"
         hosts_search_results = censys_hosts.search(hosts_query).view_all()

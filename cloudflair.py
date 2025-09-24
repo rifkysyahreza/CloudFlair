@@ -41,7 +41,7 @@ def filter_cloudfront_ips(ips):
     return [ ip for ip in ips if not cloudfront_utils.is_cloudfront_ip(ip) ]
 
 
-def find_hosts(domain, censys_api_id, censys_api_secret, use_cloudfront):
+def find_hosts(domain, censys_api_key, use_cloudfront):
     if not dns_utils.is_valid_domain(domain):
         sys.stderr.write('[-] The domain "%s" looks invalid.\n' % domain)
         exit(1)
@@ -61,7 +61,7 @@ def find_hosts(domain, censys_api_id, censys_api_secret, use_cloudfront):
         print('[*] The target appears to be behind CloudFront.')
 
     print('[*] Looking for certificates matching "%s" using Censys' % domain)
-    cert_fingerprints = censys_search.get_certificates(domain, censys_api_id, censys_api_secret)
+    cert_fingerprints = censys_search.get_certificates(domain, censys_api_key)
     cert_fingerprints = list(cert_fingerprints)
     cert_fingerprints_count = len(cert_fingerprints)
     print('[*] %d certificates matching "%s" found.' % (cert_fingerprints_count, domain))
@@ -79,7 +79,7 @@ def find_hosts(domain, censys_api_id, censys_api_secret, use_cloudfront):
     for i in range(0, cert_fingerprints_count, CERT_CHUNK_SIZE):
         if chunking:
             print('[*] Processing chunk %d/%d' % (i/CERT_CHUNK_SIZE + 1, cert_fingerprints_count/CERT_CHUNK_SIZE))
-        hosts.update(censys_search.get_hosts(cert_fingerprints[i:i+CERT_CHUNK_SIZE], censys_api_id, censys_api_secret))
+        hosts.update(censys_search.get_hosts(cert_fingerprints[i:i+CERT_CHUNK_SIZE], censys_api_key))
 
     hosts = filter_cloudflare_ips(hosts) if not use_cloudfront else filter_cloudfront_ips(hosts)
     print('[*] %d IPv4 hosts presenting a certificate issued to "%s" were found.' % (len(hosts), domain))
@@ -178,8 +178,8 @@ def find_origins(domain, candidates):
     return origins
 
 
-def main(domain, output_file, censys_api_id, censys_api_secret, use_cloudfront):
-    hosts = find_hosts(domain, censys_api_id, censys_api_secret, use_cloudfront)
+def main(domain, output_file, censys_api_key, use_cloudfront):
+    hosts = find_hosts(domain, censys_api_key, use_cloudfront)
     print_hosts(hosts)
     origins = find_origins(domain, hosts)
 
@@ -195,19 +195,16 @@ def main(domain, output_file, censys_api_id, censys_api_secret, use_cloudfront):
 if __name__ == "__main__":
     args = cli.parser.parse_args()
 
-    censys_api_id = None
-    censys_api_secret = None
+    censys_api_key = None
 
-    if 'CENSYS_API_ID' in os.environ and 'CENSYS_API_SECRET' in os.environ:
-        censys_api_id = os.environ['CENSYS_API_ID']
-        censys_api_secret = os.environ['CENSYS_API_SECRET']
+    if 'CENSYS_API_KEY' in os.environ:
+        censys_api_key = os.environ['CENSYS_API_KEY']
 
-    if args.censys_api_id and args.censys_api_secret:
-        censys_api_id = args.censys_api_id
-        censys_api_secret = args.censys_api_secret
+    if hasattr(args, 'censys_api_key') and args.censys_api_key:
+        censys_api_key = args.censys_api_key
 
-    if None in [ censys_api_id, censys_api_secret ]:
-        sys.stderr.write('[!] Please set your Censys API ID and secret from your environment (CENSYS_API_ID and CENSYS_API_SECRET) or from the command line.\n')
+    if censys_api_key is None:
+        sys.stderr.write('[!] Please set your Censys Personal Access Token from your environment (CENSYS_API_KEY) or via --censys-api-key.\n')
         exit(1)
-    
-    main(args.domain, args.output_file, censys_api_id, censys_api_secret, args.use_cloudfront)
+
+    main(args.domain, args.output_file, censys_api_key, args.use_cloudfront)
